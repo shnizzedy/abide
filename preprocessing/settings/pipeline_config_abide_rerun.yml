@@ -524,7 +524,7 @@ degWeightOptions :  [True, True]
 
 
 # Select the type of threshold used when creating the degree centrality adjacency matrix.
-degCorrelationThresholdOption :  0
+degCorrelationThresholdOption :  ["Significance threshold"]
 
 
 # Based on the Threshold Type selected above, enter a Threshold Value.
@@ -539,7 +539,7 @@ eigWeightOptions :  [False, False]
 
 
 # Select the type of threshold used when creating the eigenvector centrality adjacency matrix.
-eigCorrelationThresholdOption :  0
+eigCorrelationThresholdOption :  ["Significance threshold"]
 
 
 # Based on the Threshold Type selected above, enter a Threshold Value.
@@ -554,7 +554,7 @@ lfcdWeightOptions :  [True, False]
 
 
 # Select the type of threshold used when creating the lFCD adjacency matrix.
-lfcdCorrelationThresholdOption :  0
+lfcdCorrelationThresholdOption :  ["Significance threshold"]
 
 
 # Based on the Threshold Type selected above, enter a Threshold Value.
