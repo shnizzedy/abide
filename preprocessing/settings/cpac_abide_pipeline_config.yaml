@@ -1215,6 +1215,9 @@ nuisance_corrections:
            tissues:
              - WhiteMatter
              - CerebrospinalFluid
+        Bandpass:
+            bottom_frequency: 0.01
+            top_frequency: 0.1
         Motion:
            include_delayed: true
            include_squared: true
@@ -1222,6 +1225,39 @@ nuisance_corrections:
         PolyOrt:
           degree: 2
       - Name: filt_global
+        aCompCor:
+           summary:
+             method: DetrendPC
+             components: 5
+           tissues:
+             - WhiteMatter
+             - CerebrospinalFluid
+        Bandpass:
+           bottom_frequency: 0.01
+           top_frequency: 0.1
+        Motion:
+           include_delayed: true
+           include_squared: true
+           include_delayed_squared: true
+        GlobalSignal:
+          summary: Mean
+        PolyOrt:
+          degree: 2
+      - Name: nofilt_noglobal
+        aCompCor:
+           summary:
+             method: DetrendPC
+             components: 5
+           tissues:
+             - WhiteMatter
+             - CerebrospinalFluid
+        Motion:
+           include_delayed: true
+           include_squared: true
+           include_delayed_squared: true
+        PolyOrt:
+          degree: 2
+      - Name: nofilt_global
         aCompCor:
            summary:
              method: DetrendPC
