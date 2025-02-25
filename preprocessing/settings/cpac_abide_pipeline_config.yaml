@@ -959,7 +959,7 @@ functional_preproc:
     # Interpolate voxel time courses so they are sampled at the same time points.
     # this is a fork point
     #   run: [On, Off] - this will run both and fork the pipeline
-    run: [Off]
+    run: [On]
 
     # use specified slice time pattern rather than one in header
     tpattern:
@@ -1207,14 +1207,42 @@ nuisance_corrections:
 
     # Select which nuisance signal corrections to apply
     Regressors:
-      - Name: 24Friston_Filt
+      - Name: NuisanceGSR
+        aCompCor:
+           summary:
+             method: DetrendPC
+             components: 5
+           tissues:
+             - WhiteMatter
+             - CerebrospinalFluid
         Bandpass:
-            bottom_frequency: 0.009
+            bottom_frequency: 0.01
             top_frequency: 0.1
         Motion:
            include_delayed: true
            include_squared: true
            include_delayed_squared: true
+        GlobalSignal:
+          summary: Mean
+        PolyOrt:
+          degree: 2
+      - Name: NuisanceNoGSR
+        aCompCor:
+           summary:
+             method: DetrendPC
+             components: 5
+           tissues:
+             - WhiteMatter
+             - CerebrospinalFluid
+        Bandpass:
+            bottom_frequency: 0.01
+            top_frequency: 0.1
+        Motion:
+           include_delayed: true
+           include_squared: true
+           include_delayed_squared: true
+        PolyOrt:
+          degree: 2
 
     # Process and refine masks used to produce regressors and time series for
     # regression.
