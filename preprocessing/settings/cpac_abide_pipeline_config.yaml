@@ -10,7 +10,7 @@ pipeline_setup:
 
   # Name for this pipeline configuration - useful for identification.
   # This string will be sanitized and used in filepaths
-  pipeline_name: abide_rerun
+  pipeline_name: abide_rerun_v2
   output_directory:
 
     # Quality control outputs
@@ -444,7 +444,7 @@ segmentation:
 
     # using: ['FSL-FAST', 'Template_Based', 'ANTs_Prior_Based', 'FreeSurfer']
     # this is a fork point
-    using: [ANTs_Prior_Based]
+    using: [FSL-FAST]
 
     # option parameters
     FSL-FAST:
@@ -459,10 +459,10 @@ segmentation:
           # The values remaining will become the binary tissue masks.
           # A good starting point is 0.95.
           # CSF (cerebrospinal fluid) threshold.
-          CSF_threshold_value: 0.96
+          CSF_threshold_value: 0.98
 
           # White matter threshold.
-          WM_threshold_value: 0.96
+          WM_threshold_value: 0.98
 
           # Gray matter threshold.
           GM_threshold_value: 0.7
@@ -600,7 +600,7 @@ registration_workflows:
       # using: ['ANTS', 'FSL', 'FSL-linear']
       # this is a fork point
       #   selecting both ['ANTS', 'FSL'] will run both and fork the pipeline
-      using: [ANTS]
+      using: [FSL]
 
       # option parameters
       ANTs:
@@ -693,7 +693,7 @@ registration_workflows:
     T1w_brain_template_mask: $FSLDIR/data/standard/MNI152_T1_${resolution_for_anat}_brain_mask.nii.gz
 
     # Register skull-on anatomical image to a template.
-    reg_with_skull: On
+    reg_with_skull: Off
 
   functional_registration:
     coregistration:
@@ -959,7 +959,7 @@ functional_preproc:
     # Interpolate voxel time courses so they are sampled at the same time points.
     # this is a fork point
     #   run: [On, Off] - this will run both and fork the pipeline
-    run: [On]
+    run: [Off]
 
     # use specified slice time pattern rather than one in header
     tpattern:
@@ -984,7 +984,7 @@ functional_preproc:
       # Forking is currently broken for this option.
       # Please use separate configs if you want to use each of 3dvolreg and mcflirt.
       # Follow https://github.com/FCP-INDI/C-PAC/issues/1935 to see when this issue is resolved.
-      using: []
+      using: [3dvolreg]
 
       # option parameters
       AFNI-3dvolreg:
@@ -1080,7 +1080,7 @@ functional_preproc:
       fmap_skullstrip_AFNI_threshold: 0.6
 
   func_masking:
-    run: Off
+    run: On
     FSL-BET:
 
       # Set an intensity threshold to improve skull stripping performances of FSL BET on rodent scans.
@@ -1156,12 +1156,12 @@ functional_preproc:
   generate_func_mean:
 
     # Generate mean functional image
-    run: Off
+    run: On
 
   normalize_func:
 
     # Normalize functional image
-    run: Off
+    run: On
 
   truncation:
 
@@ -1169,7 +1169,7 @@ functional_preproc:
     # Default is 0 (beginning of timeseries).
     # First timepoint selection in the scan parameters in the data configuration file, if present, will over-ride this selection.
     # Note: the selection here applies to all scans of all participants.
-    start_tr: 4
+    start_tr: 0
 
     # Last timepoint to include in analysis.
     # Default is None or End (end of timeseries).
@@ -1196,7 +1196,7 @@ functional_preproc:
   coreg_prep:
 
     # Generate sbref
-    run: Off
+    run: On
 
 nuisance_corrections:
   2-nuisance_regression:
@@ -1207,72 +1207,15 @@ nuisance_corrections:
 
     # Select which nuisance signal corrections to apply
     Regressors:
-      - Name: filt_noglobal
-        aCompCor:
-           summary:
-             method: DetrendPC
-             components: 5
-           tissues:
-             - WhiteMatter
-             - CerebrospinalFluid
+      - Name: 24Friston_Filt
         Bandpass:
-            bottom_frequency: 0.01
+            bottom_frequency: 0.009
             top_frequency: 0.1
         Motion:
            include_delayed: true
            include_squared: true
            include_delayed_squared: true
-        PolyOrt:
-          degree: 2
-      - Name: filt_global
-        aCompCor:
-           summary:
-             method: DetrendPC
-             components: 5
-           tissues:
-             - WhiteMatter
-             - CerebrospinalFluid
-        Bandpass:
-           bottom_frequency: 0.01
-           top_frequency: 0.1
-        Motion:
-           include_delayed: true
-           include_squared: true
-           include_delayed_squared: true
-        GlobalSignal:
-          summary: Mean
-        PolyOrt:
-          degree: 2
-      - Name: nofilt_noglobal
-        aCompCor:
-           summary:
-             method: DetrendPC
-             components: 5
-           tissues:
-             - WhiteMatter
-             - CerebrospinalFluid
-        Motion:
-           include_delayed: true
-           include_squared: true
-           include_delayed_squared: true
-        PolyOrt:
-          degree: 2
-      - Name: nofilt_global
-        aCompCor:
-           summary:
-             method: DetrendPC
-             components: 5
-           tissues:
-             - WhiteMatter
-             - CerebrospinalFluid
-        Motion:
-           include_delayed: true
-           include_squared: true
-           include_delayed_squared: true
-        GlobalSignal:
-          summary: Mean
-        PolyOrt:
-          degree: 2
+
     # Process and refine masks used to produce regressors and time series for
     # regression.
     regressor_masks:
@@ -1377,7 +1320,7 @@ nuisance_corrections:
     denoising_type: nonaggr
 
 timeseries_extraction:
-  run: On
+  run: Off
   connectivity_matrix:
 
     # Create a connectivity matrix from timeseries data
@@ -1417,7 +1360,7 @@ amplitude_low_frequency_fluctuation:
 
   # ALFF & f/ALFF
   # Calculate Amplitude of Low Frequency Fluctuations (ALFF) and fractional ALFF (f/ALFF) for all voxels.
-  run: On
+  run: Off
 
   # space: Template or Native
   target_space: []
@@ -1432,7 +1375,7 @@ regional_homogeneity:
 
   # ReHo
   # Calculate Regional Homogeneity (ReHo) for all voxels.
-  run: On
+  run: Off
 
   # space: Template or Native
   target_space: []
@@ -1447,7 +1390,7 @@ voxel_mirrored_homotopic_connectivity:
 
   # VMHC
   # Calculate Voxel-mirrored Homotopic Connectivity (VMHC) for all voxels.
-  run: On
+  run: Off
   symmetric_registration:
 
     # Included as part of the 'Image Resource Files' package available on the Install page of the User Guide.
@@ -1482,7 +1425,7 @@ voxel_mirrored_homotopic_connectivity:
 network_centrality:
 
   # Calculate Degree, Eigenvector Centrality, or Functional Connectivity Density.
-  run: On
+  run: Off
 
   # Maximum amount of RAM (in GB) to be used when calculating Degree Centrality.
   # Calculating Eigenvector Centrality will require additional memory based on the size of the mask or number of ROI nodes.
@@ -1618,7 +1561,7 @@ seed_based_correlation_analysis:
   # SCA - Seed-Based Correlation Analysis
   # For each extracted ROI Average time series, CPAC will generate a whole-brain correlation map.
   # It should be noted that for a given seed/ROI, SCA maps for ROI Average time series will be the same.
-  run: On
+  run: Off
 
   # Enter paths to region-of-interest (ROI) NIFTI files (.nii or .nii.gz) to be used for seed-based correlation analysis, and then select which types of analyses to run.
   # Denote which analyses to run for each ROI path by listing the names below. For example, if you wish to run Avg and MultReg, you would enter: '/path/to/ROI.nii.gz': Avg, MultReg
